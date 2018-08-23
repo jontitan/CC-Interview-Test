@@ -22,7 +22,24 @@ class InterviewApplicationTests {
         val result = testRestTemplate.postForEntity<String>("/create")
         then(result).isNotNull
         then(result.statusCode).isEqualTo(HttpStatus.OK)
-        then(result.body).isEqualTo("foo")
+        then(result.body).isEqualTo(
+                System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator()
+        )
     }
 
 }
