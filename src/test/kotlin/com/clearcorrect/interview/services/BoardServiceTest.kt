@@ -17,9 +17,9 @@ class BoardServiceTest {
         val board: List<List<Char>> = subject.create()
         then(board.size).isEqualTo(15)
 
-        for (row: List<Char> in board) {
+        board.forEach { row: List<Char> ->
             then(row.size).isEqualTo(15)
-            for (cell: Char in row) {
+            row.forEach { cell: Char ->
                 then(cell).isEqualTo('.')
             }
         }

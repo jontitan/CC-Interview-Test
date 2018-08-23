@@ -18,8 +18,18 @@ class InterviewApplicationTests {
     lateinit var testRestTemplate: TestRestTemplate
 
     @Test
-    fun gameController() {
-        val result = testRestTemplate.postForEntity<String>("/create")
+    fun gameController_create() {
+        val result = testRestTemplate.postForEntity<Number>("/game")
+        then(result).isNotNull
+        then(result.statusCode).isEqualTo(HttpStatus.OK)
+        then(result.body).isNotNull
+    }
+
+    @Test
+    fun gameController_fetch() {
+        val postResult = testRestTemplate.postForEntity<Number>("/game")
+
+        val result = testRestTemplate.getForEntity("/game?id=" + postResult.body, String::class.java)
         then(result).isNotNull
         then(result.statusCode).isEqualTo(HttpStatus.OK)
         then(result.body).isEqualTo(
@@ -41,5 +51,4 @@ class InterviewApplicationTests {
                         "..............." + System.lineSeparator()
         )
     }
-
 }
