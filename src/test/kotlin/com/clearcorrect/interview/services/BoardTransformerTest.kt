@@ -14,7 +14,7 @@ class BoardTransformerTest {
 
     @Test
     fun present() {
-        val board: List<List<Char>> = List(5) { List(5) { '.' } }
+        val board: Array<CharArray> = Array(5) { CharArray(5) { '.' } }
         then(subject.present(board)).isEqualTo(
                 System.lineSeparator() +
                         "....." + System.lineSeparator() +
@@ -27,20 +27,20 @@ class BoardTransformerTest {
 
     @Test
     fun toDBString() {
-        val board: MutableList<MutableList<Char>> = MutableList(3) { MutableList(3) { '.' } }
-        board[0] = mutableListOf('a', 'b', 'c')
-        board[1] = mutableListOf('d', 'e', 'f')
-        board[2] = mutableListOf('g', 'h', 'i')
+        val board: Array<CharArray> = Array(3) { CharArray(3) { '.' } }
+        board[0] = charArrayOf('a', 'b', 'c')
+        board[1] = charArrayOf('d', 'e', 'f')
+        board[2] = charArrayOf('g', 'h', 'i')
 
         then(subject.toDBString(board)).isEqualTo("abcdefghi")
     }
 
     @Test
     fun fromDBString() {
-        val board: MutableList<MutableList<Char>> = MutableList(3) { MutableList(3) { '.' } }
-        board[0] = mutableListOf('a', 'b', 'c')
-        board[1] = mutableListOf('d', 'e', 'f')
-        board[2] = mutableListOf('g', 'h', 'i')
+        val board: Array<CharArray> = Array(3) { CharArray(3) { '.' } }
+        board[0] = charArrayOf('a', 'b', 'c')
+        board[1] = charArrayOf('d', 'e', 'f')
+        board[2] = charArrayOf('g', 'h', 'i')
 
         then(subject.fromDBString("abcdefghi", 3)).isEqualTo(board)
     }

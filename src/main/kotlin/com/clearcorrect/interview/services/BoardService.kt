@@ -1,5 +1,6 @@
 package com.clearcorrect.interview.services
 
+import com.clearcorrect.interview.CharacterConflictException
 import com.clearcorrect.interview.dtos.Direction
 import com.clearcorrect.interview.dtos.PlayDTO
 import com.clearcorrect.interview.persistence.BoardEntity
@@ -19,7 +20,7 @@ class BoardService {
     val DEFAULT_WIDTH = 15
 
     fun create(): Long {
-        val board = List(DEFAULT_WIDTH) { List(DEFAULT_WIDTH) { '.' } }
+        val board = Array(DEFAULT_WIDTH) { CharArray(DEFAULT_WIDTH) { '.' } }
         val boardEntity = BoardEntity()
         boardEntity.board = boardTransformer.toDBString(board)
         boardEntity.width = DEFAULT_WIDTH
@@ -37,18 +38,26 @@ class BoardService {
     fun play(playDTO: PlayDTO): String {
         val boardEntity = boardRepository.findById(playDTO.id).get()
         val board = boardTransformer.fromDBString(boardEntity.board, DEFAULT_WIDTH)
-        val x = playDTO.coordinate.first
-        val y = playDTO.coordinate.second
+        val r = playDTO.coordinate.first
+        val c = playDTO.coordinate.second
         var counter = 0
         when (playDTO.direction) {
             Direction.DOWN -> {
-                for (i in x until x + playDTO.word.length) {
-                    board[i][y] = playDTO.word[counter++].toUpperCase()
+                for (i in r until r + playDTO.word.length) {
+                    if (board[i][c] != '.' &&
+                            board[i][c] != playDTO.word[counter].toUpperCase()) {
+                        throw CharacterConflictException()
+                    }
+                    board[i][c] = playDTO.word[counter++].toUpperCase()
                 }
             }
             Direction.RIGHT -> {
-                for (i in y until y + playDTO.word.length) {
-                    board[x][i] = playDTO.word[counter++].toUpperCase()
+                for (i in c until c + playDTO.word.length) {
+                    if (board[r][i] != '.' &&
+                            board[r][i] != playDTO.word[counter].toUpperCase()) {
+                        throw CharacterConflictException()
+                    }
+                    board[r][i] = playDTO.word[counter++].toUpperCase()
                 }
             }
         }

@@ -4,9 +4,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class BoardTransformer {
-    fun present(board: List<List<Char>>): String {
+    fun present(board: Array<CharArray>): String {
         var boardAsString = System.lineSeparator()
-        board.forEach { row: List<Char> ->
+        for (row: CharArray in board) {
             row.forEach { cell: Char ->
                 boardAsString += cell
             }
@@ -15,9 +15,9 @@ class BoardTransformer {
         return boardAsString
     }
 
-    fun toDBString(board: List<List<Char>>): String {
+    fun toDBString(board: Array<CharArray>): String {
         var dbString = ""
-        board.forEach { row: List<Char> ->
+        for (row: CharArray in board) {
             row.forEach { cell: Char ->
                 dbString += cell
             }
@@ -25,8 +25,8 @@ class BoardTransformer {
         return dbString
     }
 
-    fun fromDBString(dbString: String, width: Int): MutableList<MutableList<Char>> {
-        val board: MutableList<MutableList<Char>> = MutableList(width) { MutableList(width) { '.' } }
+    fun fromDBString(dbString: String, width: Int): Array<CharArray> {
+        val board: Array<CharArray> = Array(width) { CharArray(width) { '.' } }
         var counter = 0
         for (i in 0 until width) {
             for (j in 0 until width) {
