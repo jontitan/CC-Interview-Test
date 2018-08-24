@@ -42,11 +42,6 @@ class BoardTransformerTest {
         board[1] = mutableListOf('d', 'e', 'f')
         board[2] = mutableListOf('g', 'h', 'i')
 
-        then(subject.fromDBString("abcdefghi", 3)).isEqualTo(
-                System.lineSeparator() +
-                        "abc" + System.lineSeparator() +
-                        "def" + System.lineSeparator() +
-                        "ghi" + System.lineSeparator()
-        )
+        then(subject.fromDBString("abcdefghi", 3)).isEqualTo(board)
     }
 }

@@ -25,7 +25,7 @@ class BoardTransformer {
         return dbString
     }
 
-    fun fromDBString(dbString: String, width: Int): String {
+    fun fromDBString(dbString: String, width: Int): MutableList<MutableList<Char>> {
         val board: MutableList<MutableList<Char>> = MutableList(width) { MutableList(width) { '.' } }
         var counter = 0
         for (i in 0 until width) {
@@ -33,6 +33,6 @@ class BoardTransformer {
                 board[i][j] = dbString[counter++]
             }
         }
-        return present(board)
+        return board
     }
 }

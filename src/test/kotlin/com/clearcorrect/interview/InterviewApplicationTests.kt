@@ -1,5 +1,7 @@
 package com.clearcorrect.interview
 
+import com.clearcorrect.interview.dtos.Direction
+import com.clearcorrect.interview.dtos.PlayDTO
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,24 +20,53 @@ class InterviewApplicationTests {
     lateinit var testRestTemplate: TestRestTemplate
 
     @Test
-    fun gameController_create() {
-        val result = testRestTemplate.postForEntity<Number>("/game")
+    fun boardController_create() {
+        val result = testRestTemplate.postForEntity<Number>("/board")
         then(result).isNotNull
         then(result.statusCode).isEqualTo(HttpStatus.OK)
         then(result.body).isNotNull
     }
 
     @Test
-    fun gameController_fetch() {
-        val postResult = testRestTemplate.postForEntity<Number>("/game")
+    fun boardController_fetch() {
+        val postResult = testRestTemplate.postForEntity<Number>("/board")
 
-        val result = testRestTemplate.getForEntity("/game?id=" + postResult.body, String::class.java)
+        val result = testRestTemplate.getForEntity("/board?id=" + postResult.body, String::class.java)
         then(result).isNotNull
         then(result.statusCode).isEqualTo(HttpStatus.OK)
         then(result.body).isEqualTo(
                 System.lineSeparator() +
                         "..............." + System.lineSeparator() +
                         "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        "..............." + System.lineSeparator()
+        )
+    }
+
+    @Test
+    fun boardController_play() {
+        val postResult = testRestTemplate.postForEntity<Long>("/board")
+
+        val playDTO = PlayDTO(postResult.body!!, Pair(1, 1), Direction.RIGHT, "dog")
+
+        val result = testRestTemplate.postForEntity<String>("/play", playDTO)
+        then(result).isNotNull
+        then(result.statusCode).isEqualTo(HttpStatus.OK)
+        then(result.body).isEqualTo(
+                System.lineSeparator() +
+                        "..............." + System.lineSeparator() +
+                        ".DOG..........." + System.lineSeparator() +
                         "..............." + System.lineSeparator() +
                         "..............." + System.lineSeparator() +
                         "..............." + System.lineSeparator() +
