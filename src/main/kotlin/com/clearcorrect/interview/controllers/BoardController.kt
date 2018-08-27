@@ -20,4 +20,9 @@ class BoardController {
     fun fetchGame(@RequestParam id: Long): String {
         return boardService.fetch(id)
     }
+
+    @GetMapping("/all")
+    fun fetchAllGames(): List<String> {
+        return boardService.fetchAll()
+    }
 }

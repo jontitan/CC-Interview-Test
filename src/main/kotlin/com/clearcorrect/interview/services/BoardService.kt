@@ -75,4 +75,12 @@ class BoardService {
         boardRepository.save(boardEntity)
         return boardTransformer.present(board)
     }
+
+    fun fetchAll(): List<String> {
+        return boardRepository.findAll().map {
+            boardTransformer.present(
+                    boardTransformer.fromDBString(it.board, it.rows, it.columns)
+            )
+        }
+    }
 }

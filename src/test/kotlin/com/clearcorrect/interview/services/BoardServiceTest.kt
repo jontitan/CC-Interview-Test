@@ -167,4 +167,61 @@ class BoardServiceTest {
         playDTO = PlayDTO(id, Pair(14, 14), Direction.DOWN, "dog")
         subject.play(playDTO)
     }
+
+    @Test
+    fun fetchAll_callsBoardRepository() {
+        subject.fetchAll()
+        verify(mockBoardRepository).findAll()
+    }
+
+    @Test
+    fun fetchAll_returnsAListOfBoardsAsString() {
+        `when`(mockBoardRepository.findAll()).thenReturn(
+                Arrays.asList(
+                        BoardEntity(),
+                        BoardEntity(),
+                        BoardEntity(),
+                        BoardEntity(),
+                        BoardEntity()
+                )
+        )
+        then(subject.fetchAll().size).isEqualTo(5)
+    }
+
+    @Test
+    fun fetchAll_callsTransformerOnEachBoard() {
+        val board1 = BoardEntity()
+        val board2 = BoardEntity()
+        val board3 = BoardEntity()
+        board1.board = "board1"
+        board2.board = "board2"
+        board3.board = "board3"
+
+        `when`(mockBoardRepository.findAll()).thenReturn(
+                Arrays.asList(
+                        board1,
+                        board2,
+                        board3
+                )
+        )
+        subject.fetchAll()
+
+        verify(mockBoardTransformer).fromDBString("board1", 0, 0)
+        verify(mockBoardTransformer).fromDBString("board2", 0, 0)
+        verify(mockBoardTransformer).fromDBString("board3", 0, 0)
+    }
+
+    @Test
+    fun fetchAll_CallsPresentOnEachBoards() {
+        `when`(mockBoardRepository.findAll()).thenReturn(
+                Arrays.asList(
+                        BoardEntity(),
+                        BoardEntity(),
+                        BoardEntity()
+                )
+        )
+        subject.fetchAll()
+
+        verify(mockBoardTransformer, times(3)).present(board)
+    }
 }

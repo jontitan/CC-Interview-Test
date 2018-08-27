@@ -73,6 +73,20 @@ class InterviewApplicationTests {
     }
 
     @Test
+    fun boardController_fetchAll() {
+        testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
+        testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
+        testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
+        testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
+        testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
+
+        val result = testRestTemplate.getForEntity("/board/all", List::class.java)
+        then(result).isNotNull
+        then(result.statusCode).isEqualTo(HttpStatus.OK)
+        then(result.body?.size).isGreaterThanOrEqualTo(5)
+    }
+
+    @Test
     fun boardController_play() {
         val postResult = testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
 
