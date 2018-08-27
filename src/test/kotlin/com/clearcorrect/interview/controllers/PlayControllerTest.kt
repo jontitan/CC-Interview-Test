@@ -4,13 +4,13 @@ import com.clearcorrect.interview.dtos.Direction
 import com.clearcorrect.interview.dtos.PlayDTO
 import com.clearcorrect.interview.services.BoardService
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.whenever
 import org.assertj.core.api.Java6BDDAssertions.then
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -29,7 +29,7 @@ class PlayControllerTest {
 
     @Before
     fun setUp() {
-        `when`(mockBoardService.play(any())).thenReturn(readableBoard)
+        whenever(mockBoardService.play(any())).thenReturn(readableBoard)
     }
 
     @Test

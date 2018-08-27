@@ -1,13 +1,15 @@
 package com.clearcorrect.interview.controllers
 
 import com.clearcorrect.interview.services.BoardService
+import com.nhaarman.mockito_kotlin.whenever
 import org.assertj.core.api.Java6BDDAssertions.then
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.anyLong
+import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
 
@@ -26,8 +28,8 @@ class BoardControllerTest {
 
     @Before
     fun setUp() {
-        `when`(mockBoardService.create(Optional.empty())).thenReturn(id)
-        `when`(mockBoardService.fetch(anyLong())).thenReturn(readableBoard)
+        whenever(mockBoardService.create(Optional.empty())).thenReturn(id)
+        whenever(mockBoardService.fetch(anyLong())).thenReturn(readableBoard)
     }
 
     @Test

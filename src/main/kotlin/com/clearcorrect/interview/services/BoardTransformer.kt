@@ -1,5 +1,6 @@
 package com.clearcorrect.interview.services
 
+import com.clearcorrect.interview.persistence.BoardEntity
 import org.springframework.stereotype.Service
 
 @Service
@@ -34,5 +35,11 @@ class BoardTransformer {
             }
         }
         return board
+    }
+
+    fun presentFromEntity(boardEntity: BoardEntity?): String {
+        return present(
+                fromDBString(boardEntity!!.board, boardEntity.rows, boardEntity.columns)
+        )
     }
 }

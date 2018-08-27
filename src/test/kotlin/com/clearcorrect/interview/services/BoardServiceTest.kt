@@ -7,6 +7,7 @@ import com.clearcorrect.interview.persistence.BoardEntity
 import com.clearcorrect.interview.persistence.BoardRepository
 import com.nhaarman.mockito_kotlin.anyArray
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockito_kotlin.whenever
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.Before
 import org.junit.Test
@@ -37,19 +38,20 @@ class BoardServiceTest {
     private val board = Array(15) { _ -> CharArray(15) { '.' } }
     private val readableBoard = "readableBoard"
     private var playDTO = PlayDTO(id, Pair(1, 1), Direction.RIGHT, "dog")
+    private val boardEntity = BoardEntity()
 
     @Before
     fun setUp() {
-        val boardEntity = BoardEntity()
-        `when`(mockBoardTransformer.toDBString(anyArray())).thenReturn(boardDBString)
+        whenever(mockBoardTransformer.toDBString(anyArray())).thenReturn(boardDBString)
         boardEntity.id = id
         boardEntity.board = boardDBString
         boardEntity.rows = 15
         boardEntity.columns = 15
-        `when`(mockBoardRepository.save(any(BoardEntity::class.java))).thenReturn(boardEntity)
-        `when`(mockBoardRepository.findById(anyLong())).thenReturn(Optional.of(boardEntity))
-        `when`(mockBoardTransformer.fromDBString(anyString(), anyInt(), anyInt())).thenReturn(board)
-        `when`(mockBoardTransformer.present(anyArray())).thenReturn(readableBoard)
+        whenever(mockBoardRepository.save(any(BoardEntity::class.java))).thenReturn(boardEntity)
+        whenever(mockBoardRepository.findById(anyLong())).thenReturn(Optional.of(boardEntity))
+        whenever(mockBoardTransformer.fromDBString(anyString(), anyInt(), anyInt())).thenReturn(board)
+        whenever(mockBoardTransformer.present(anyArray())).thenReturn(readableBoard)
+        whenever(mockBoardTransformer.presentFromEntity(any())).thenReturn(readableBoard)
     }
 
     @Test
@@ -108,8 +110,7 @@ class BoardServiceTest {
     @Test
     fun fetch_callsBoardTransformer() {
         subject.fetch(123L)
-        verify(mockBoardTransformer).fromDBString(boardDBString, 15, 15)
-        verify(mockBoardTransformer).present(board)
+        verify(mockBoardTransformer).presentFromEntity(boardEntity)
     }
 
     @Test
@@ -159,7 +160,7 @@ class BoardServiceTest {
     fun play_whenCharactersConflicts() {
         playDTO = PlayDTO(id, Pair(1, 1), Direction.DOWN, "dog")
         board[1][1] = 'A'
-        `when`(mockBoardTransformer.fromDBString(anyString(), anyInt(), anyInt())).thenReturn(board)
+        whenever(mockBoardTransformer.fromDBString(anyString(), anyInt(), anyInt())).thenReturn(board)
         subject.play(playDTO)
     }
 
@@ -177,7 +178,7 @@ class BoardServiceTest {
 
     @Test
     fun fetchAll_returnsAListOfBoardsAsString() {
-        `when`(mockBoardRepository.findAll()).thenReturn(
+        whenever(mockBoardRepository.findAll()).thenReturn(
                 Arrays.asList(
                         BoardEntity(),
                         BoardEntity(),
@@ -194,11 +195,8 @@ class BoardServiceTest {
         val board1 = BoardEntity()
         val board2 = BoardEntity()
         val board3 = BoardEntity()
-        board1.board = "board1"
-        board2.board = "board2"
-        board3.board = "board3"
 
-        `when`(mockBoardRepository.findAll()).thenReturn(
+        whenever(mockBoardRepository.findAll()).thenReturn(
                 Arrays.asList(
                         board1,
                         board2,
@@ -207,28 +205,14 @@ class BoardServiceTest {
         )
         subject.fetchAll()
 
-        verify(mockBoardTransformer).fromDBString("board1", 0, 0)
-        verify(mockBoardTransformer).fromDBString("board2", 0, 0)
-        verify(mockBoardTransformer).fromDBString("board3", 0, 0)
-    }
-
-    @Test
-    fun fetchAll_CallsPresentOnEachBoards() {
-        `when`(mockBoardRepository.findAll()).thenReturn(
-                Arrays.asList(
-                        BoardEntity(),
-                        BoardEntity(),
-                        BoardEntity()
-                )
-        )
-        subject.fetchAll()
-
-        verify(mockBoardTransformer, times(3)).present(board)
+        verify(mockBoardTransformer).presentFromEntity(board1)
+        verify(mockBoardTransformer).presentFromEntity(board2)
+        verify(mockBoardTransformer).presentFromEntity(board3)
     }
 
     @Test
     fun fetchHistory_CallsRepository() {
-        `when`(mockBoardRepository.findRevisions(anyLong())).thenReturn(Revisions.none())
+        whenever(mockBoardRepository.findRevisions(anyLong())).thenReturn(Revisions.none())
         subject.fetchHistory(123L)
 
         verify(mockBoardRepository).findRevisions(123L)

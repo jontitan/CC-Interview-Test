@@ -38,9 +38,7 @@ class BoardService {
 
     fun fetch(id: Long): String {
         return boardRepository.findById(id).map {
-            boardTransformer.present(
-                    boardTransformer.fromDBString(it.board, it.rows, it.columns)
-            )
+            boardTransformer.presentFromEntity(it)
         }.get()
     }
 
@@ -78,17 +76,13 @@ class BoardService {
 
     fun fetchAll(): List<String> {
         return boardRepository.findAll().map {
-            boardTransformer.present(
-                    boardTransformer.fromDBString(it.board, it.rows, it.columns)
-            )
+            boardTransformer.presentFromEntity(it)
         }
     }
 
     fun fetchHistory(id: Long): List<String> {
         return boardRepository.findRevisions(id).content.map {
-            boardTransformer.present(
-                    boardTransformer.fromDBString(it.entity.board, it.entity.rows, it.entity.columns)
-            )
+            boardTransformer.presentFromEntity(it.entity)
         }
     }
 }
