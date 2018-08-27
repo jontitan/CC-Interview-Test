@@ -83,4 +83,12 @@ class BoardService {
             )
         }
     }
+
+    fun fetchHistory(id: Long): List<String> {
+        return boardRepository.findRevisions(id).content.map {
+            boardTransformer.present(
+                    boardTransformer.fromDBString(it.entity.board, it.entity.rows, it.entity.columns)
+            )
+        }
+    }
 }

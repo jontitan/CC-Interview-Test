@@ -15,6 +15,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
+import org.springframework.data.history.Revisions
 import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
@@ -223,5 +224,13 @@ class BoardServiceTest {
         subject.fetchAll()
 
         verify(mockBoardTransformer, times(3)).present(board)
+    }
+
+    @Test
+    fun fetchHistory_CallsRepository() {
+        `when`(mockBoardRepository.findRevisions(anyLong())).thenReturn(Revisions.none())
+        subject.fetchHistory(123L)
+
+        verify(mockBoardRepository).findRevisions(123L)
     }
 }

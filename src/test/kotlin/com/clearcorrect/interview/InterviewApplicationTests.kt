@@ -87,7 +87,7 @@ class InterviewApplicationTests {
     }
 
     @Test
-    fun boardController_play() {
+    fun playController_play() {
         val postResult = testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
 
         var playDTO = PlayDTO(postResult.body!!, Pair(1, 1), Direction.RIGHT, "clear")
@@ -150,5 +150,82 @@ class InterviewApplicationTests {
         then(result).isNotNull
         then(result.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
         then(result.body).isEqualTo("Word Too Long")
+    }
+
+    @Test
+    fun playController_playHistory() {
+        val postResult = testRestTemplate.postForEntity<Long>("/board", Pair(6, 7))
+
+        var playDTO = PlayDTO(postResult.body!!, Pair(0, 0), Direction.RIGHT, "first")
+        testRestTemplate.postForEntity<String>("/play", playDTO)
+
+        playDTO = PlayDTO(postResult.body!!, Pair(0, 3), Direction.DOWN, "second")
+        testRestTemplate.postForEntity<String>("/play", playDTO)
+
+        playDTO = PlayDTO(postResult.body!!, Pair(0, 4), Direction.DOWN, "third")
+        testRestTemplate.postForEntity<String>("/play", playDTO)
+
+        playDTO = PlayDTO(postResult.body!!, Pair(5, 3), Direction.RIGHT, "done")
+        testRestTemplate.postForEntity<String>("/play", playDTO)
+
+        val result = testRestTemplate.getForEntity("/play/" + postResult.body + "/all", List::class.java)
+        then(result).isNotNull
+        then(result.statusCode).isEqualTo(HttpStatus.OK)
+        then(result.body?.size).isEqualTo(5)
+
+        then(result.body?.get(0)).isEqualTo(
+                System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator()
+
+        )
+
+        then(result.body?.get(1)).isEqualTo(
+                System.lineSeparator() +
+                        "FIRST.." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator() +
+                        "......." + System.lineSeparator()
+
+        )
+
+        then(result.body?.get(2)).isEqualTo(
+                System.lineSeparator() +
+                        "FIRST.." + System.lineSeparator() +
+                        "...E..." + System.lineSeparator() +
+                        "...C..." + System.lineSeparator() +
+                        "...O..." + System.lineSeparator() +
+                        "...N..." + System.lineSeparator() +
+                        "...D..." + System.lineSeparator()
+
+        )
+
+        then(result.body?.get(3)).isEqualTo(
+                System.lineSeparator() +
+                        "FIRST.." + System.lineSeparator() +
+                        "...EH.." + System.lineSeparator() +
+                        "...CI.." + System.lineSeparator() +
+                        "...OR.." + System.lineSeparator() +
+                        "...ND.." + System.lineSeparator() +
+                        "...D..." + System.lineSeparator()
+
+        )
+
+        then(result.body?.get(4)).isEqualTo(
+                System.lineSeparator() +
+                        "FIRST.." + System.lineSeparator() +
+                        "...EH.." + System.lineSeparator() +
+                        "...CI.." + System.lineSeparator() +
+                        "...OR.." + System.lineSeparator() +
+                        "...ND.." + System.lineSeparator() +
+                        "...DONE" + System.lineSeparator()
+
+        )
     }
 }

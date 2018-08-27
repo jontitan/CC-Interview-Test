@@ -19,6 +19,11 @@ class PlayController {
         return boardService.play(playDTO)
     }
 
+    @GetMapping("/{id}/all")
+    fun playHistory(@PathVariable id: Long): List<String> {
+        return boardService.fetchHistory(id)
+    }
+
     @ExceptionHandler(CharacterConflictException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleCharacterConflictException(): String {

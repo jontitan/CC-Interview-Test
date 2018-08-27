@@ -1,11 +1,12 @@
 package com.clearcorrect.interview.persistence
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import org.hibernate.envers.Audited
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import javax.persistence.*
 
 @Entity
+@Audited
+@EntityListeners(AuditingEntityListener::class)
 class BoardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
