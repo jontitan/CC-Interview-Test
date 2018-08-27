@@ -11,5 +11,6 @@ class BoardEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     var id: Long = 0
     var board: String = ""
-    var width: Int = 0
+    var rows: Int = 0
+    var columns: Int = 0
 }

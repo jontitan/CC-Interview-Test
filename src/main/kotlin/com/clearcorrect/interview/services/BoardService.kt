@@ -7,6 +7,7 @@ import com.clearcorrect.interview.persistence.BoardEntity
 import com.clearcorrect.interview.persistence.BoardRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class BoardService {
@@ -19,25 +20,33 @@ class BoardService {
 
     val DEFAULT_WIDTH = 15
 
-    fun create(): Long {
-        val board = Array(DEFAULT_WIDTH) { CharArray(DEFAULT_WIDTH) { '.' } }
+    fun create(optionalDimensions: Optional<Pair<Int, Int>>): Long {
+        val board = optionalDimensions.map<Array<CharArray>> { dimension ->
+            val rows = dimension.first
+            val columns = dimension.second
+            Array(rows) { _ -> CharArray(columns) { '.' } }
+        }.orElseGet {
+            Array(DEFAULT_WIDTH) { _ -> CharArray(DEFAULT_WIDTH) { '.' } }
+        }
+
         val boardEntity = BoardEntity()
         boardEntity.board = boardTransformer.toDBString(board)
-        boardEntity.width = DEFAULT_WIDTH
+        boardEntity.rows = board.size
+        boardEntity.columns = board[0].size
         return boardRepository.save(boardEntity).id
     }
 
     fun fetch(id: Long): String {
         return boardRepository.findById(id).map {
             boardTransformer.present(
-                    boardTransformer.fromDBString(it.board, DEFAULT_WIDTH)
+                    boardTransformer.fromDBString(it.board, it.rows, it.columns)
             )
         }.get()
     }
 
     fun play(playDTO: PlayDTO): String {
         val boardEntity = boardRepository.findById(playDTO.id).get()
-        val board = boardTransformer.fromDBString(boardEntity.board, DEFAULT_WIDTH)
+        val board = boardTransformer.fromDBString(boardEntity.board, boardEntity.rows, boardEntity.columns)
         val r = playDTO.coordinate.first
         val c = playDTO.coordinate.second
         var counter = 0

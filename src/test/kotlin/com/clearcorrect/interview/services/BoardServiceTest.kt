@@ -33,7 +33,7 @@ class BoardServiceTest {
 
     private val id = 123L
     private val boardDBString = "boardDBString"
-    private val board = Array(15) { CharArray(15) { '.' } }
+    private val board = Array(15) { _ -> CharArray(15) { '.' } }
     private val readableBoard = "readableBoard"
     private var playDTO = PlayDTO(id, Pair(1, 1), Direction.RIGHT, "dog")
 
@@ -42,16 +42,18 @@ class BoardServiceTest {
         val boardEntity = BoardEntity()
         `when`(mockBoardTransformer.toDBString(anyArray())).thenReturn(boardDBString)
         boardEntity.id = id
-        `when`(mockBoardRepository.save(any(BoardEntity::class.java))).thenReturn(boardEntity)
         boardEntity.board = boardDBString
+        boardEntity.rows = 15
+        boardEntity.columns = 15
+        `when`(mockBoardRepository.save(any(BoardEntity::class.java))).thenReturn(boardEntity)
         `when`(mockBoardRepository.findById(anyLong())).thenReturn(Optional.of(boardEntity))
-        `when`(mockBoardTransformer.fromDBString(anyString(), anyInt())).thenReturn(board)
+        `when`(mockBoardTransformer.fromDBString(anyString(), anyInt(), anyInt())).thenReturn(board)
         `when`(mockBoardTransformer.present(anyArray())).thenReturn(readableBoard)
     }
 
     @Test
     fun create_callsBoardTransformer() {
-        subject.create()
+        subject.create(Optional.empty())
         argumentCaptor<Array<CharArray>>().apply {
             verify(mockBoardTransformer).toDBString(capture())
             then(firstValue.size).isEqualTo(15)
@@ -66,20 +68,34 @@ class BoardServiceTest {
     }
 
     @Test
+    fun create_withOptionalDimensions() {
+        subject.create(Optional.of(Pair(2, 3)))
+        argumentCaptor<Array<CharArray>>().apply {
+            verify(mockBoardTransformer).toDBString(capture())
+            then(firstValue.size).isEqualTo(2)
+
+            for (row: CharArray in firstValue) {
+                then(row.size).isEqualTo(3)
+            }
+        }
+    }
+
+    @Test
     fun create_callsBoardRepositoryWith15By15Board() {
-        subject.create()
+        subject.create(Optional.empty())
         val boardEntity = BoardEntity()
         boardEntity.board = boardDBString
         argumentCaptor<BoardEntity>().apply {
             verify(mockBoardRepository).save(capture())
             then(firstValue.board).isEqualTo(boardDBString)
-            then(firstValue.width).isEqualTo(15)
+            then(firstValue.rows).isEqualTo(15)
+            then(firstValue.columns).isEqualTo(15)
         }
     }
 
     @Test
     fun create_returnsNewBoardId() {
-        then(subject.create()).isEqualTo(id)
+        then(subject.create(Optional.empty())).isEqualTo(id)
     }
 
     @Test
@@ -91,7 +107,7 @@ class BoardServiceTest {
     @Test
     fun fetch_callsBoardTransformer() {
         subject.fetch(123L)
-        verify(mockBoardTransformer).fromDBString(boardDBString, 15)
+        verify(mockBoardTransformer).fromDBString(boardDBString, 15, 15)
         verify(mockBoardTransformer).present(board)
     }
 
@@ -109,7 +125,7 @@ class BoardServiceTest {
     @Test
     fun play_callsBoardTransformer() {
         subject.play(playDTO)
-        verify(mockBoardTransformer).fromDBString(boardDBString, 15)
+        verify(mockBoardTransformer).fromDBString(boardDBString, 15, 15)
         argumentCaptor<Array<CharArray>>().apply {
             verify(mockBoardTransformer).toDBString(capture())
             then(firstValue[1][1]).isEqualTo('D')
@@ -128,7 +144,7 @@ class BoardServiceTest {
     fun play_whenDirectionIsDown() {
         playDTO = PlayDTO(id, Pair(1, 1), Direction.DOWN, "dog")
         subject.play(playDTO)
-        verify(mockBoardTransformer).fromDBString(boardDBString, 15)
+        verify(mockBoardTransformer).fromDBString(boardDBString, 15, 15)
         argumentCaptor<Array<CharArray>>().apply {
             verify(mockBoardTransformer).toDBString(capture())
             then(firstValue[1][1]).isEqualTo('D')
@@ -142,7 +158,7 @@ class BoardServiceTest {
     fun play_whenCharactersConflicts() {
         playDTO = PlayDTO(id, Pair(1, 1), Direction.DOWN, "dog")
         board[1][1] = 'A'
-        `when`(mockBoardTransformer.fromDBString(anyString(), anyInt())).thenReturn(board)
+        `when`(mockBoardTransformer.fromDBString(anyString(), anyInt(), anyInt())).thenReturn(board)
         subject.play(playDTO)
     }
 

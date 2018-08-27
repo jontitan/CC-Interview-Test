@@ -11,6 +11,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
+import java.util.*
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -21,15 +22,32 @@ class InterviewApplicationTests {
 
     @Test
     fun boardController_create() {
-        val result = testRestTemplate.postForEntity<Number>("/board")
+        val result = testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
         then(result).isNotNull
         then(result.statusCode).isEqualTo(HttpStatus.OK)
-        then(result.body).isNotNull
+        then(result.body).isGreaterThan(0)
+    }
+
+    @Test
+    fun boardController_create_withCustomDimensions() {
+        val postResult = testRestTemplate.postForEntity<Long>("/board", Pair(5, 3))
+
+        val result = testRestTemplate.getForEntity("/board?id=" + postResult.body, String::class.java)
+        then(result).isNotNull
+        then(result.statusCode).isEqualTo(HttpStatus.OK)
+        then(result.body).isEqualTo(
+                System.lineSeparator() +
+                        "..." + System.lineSeparator() +
+                        "..." + System.lineSeparator() +
+                        "..." + System.lineSeparator() +
+                        "..." + System.lineSeparator() +
+                        "..." + System.lineSeparator()
+        )
     }
 
     @Test
     fun boardController_fetch() {
-        val postResult = testRestTemplate.postForEntity<Number>("/board")
+        val postResult = testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
 
         val result = testRestTemplate.getForEntity("/board?id=" + postResult.body, String::class.java)
         then(result).isNotNull
@@ -56,7 +74,7 @@ class InterviewApplicationTests {
 
     @Test
     fun boardController_play() {
-        val postResult = testRestTemplate.postForEntity<Long>("/board")
+        val postResult = testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
 
         var playDTO = PlayDTO(postResult.body!!, Pair(1, 1), Direction.RIGHT, "clear")
         testRestTemplate.postForEntity<String>("/play", playDTO)
@@ -68,9 +86,7 @@ class InterviewApplicationTests {
         testRestTemplate.postForEntity<String>("/play", playDTO)
 
         playDTO = PlayDTO(postResult.body!!, Pair(7, 1), Direction.RIGHT, "teST")
-        testRestTemplate.postForEntity<String>("/play", playDTO)
-
-        val result = testRestTemplate.getForEntity("/board?id=" + postResult.body, String::class.java)
+        val result = testRestTemplate.postForEntity<String>("/play", playDTO)
 
         then(result).isNotNull
         then(result.statusCode).isEqualTo(HttpStatus.OK)
@@ -96,7 +112,7 @@ class InterviewApplicationTests {
 
     @Test
     fun boardController_play_whenWordConflicts_returnsBadRequest() {
-        val postResult = testRestTemplate.postForEntity<Long>("/board")
+        val postResult = testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
 
         val playDTO1 = PlayDTO(postResult.body!!, Pair(1, 1), Direction.RIGHT, "dog")
 
@@ -112,7 +128,7 @@ class InterviewApplicationTests {
 
     @Test
     fun boardController_play_whenWordTooLong_returnsBadRequest() {
-        val postResult = testRestTemplate.postForEntity<Long>("/board")
+        val postResult = testRestTemplate.postForEntity<Long>("/board", Optional.empty<Any>())
 
         val playDTO = PlayDTO(postResult.body!!, Pair(0, 14), Direction.RIGHT, "cat")
 

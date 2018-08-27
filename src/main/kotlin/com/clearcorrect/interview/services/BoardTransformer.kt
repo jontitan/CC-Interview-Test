@@ -25,11 +25,11 @@ class BoardTransformer {
         return dbString
     }
 
-    fun fromDBString(dbString: String, width: Int): Array<CharArray> {
-        val board: Array<CharArray> = Array(width) { CharArray(width) { '.' } }
+    fun fromDBString(dbString: String, rows: Int, columns: Int): Array<CharArray> {
+        val board: Array<CharArray> = Array(rows) { _ -> CharArray(columns) { '.' } }
         var counter = 0
-        for (i in 0 until width) {
-            for (j in 0 until width) {
+        for (i in 0 until rows) {
+            for (j in 0 until columns) {
                 board[i][j] = dbString[counter++]
             }
         }

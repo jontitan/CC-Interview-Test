@@ -14,7 +14,7 @@ class BoardTransformerTest {
 
     @Test
     fun present() {
-        val board: Array<CharArray> = Array(5) { CharArray(5) { '.' } }
+        val board: Array<CharArray> = Array(5) { _ -> CharArray(5) { '.' } }
         then(subject.present(board)).isEqualTo(
                 System.lineSeparator() +
                         "....." + System.lineSeparator() +
@@ -27,7 +27,7 @@ class BoardTransformerTest {
 
     @Test
     fun toDBString() {
-        val board: Array<CharArray> = Array(3) { CharArray(3) { '.' } }
+        val board: Array<CharArray> = Array(3) { _ -> CharArray(3) { '.' } }
         board[0] = charArrayOf('a', 'b', 'c')
         board[1] = charArrayOf('d', 'e', 'f')
         board[2] = charArrayOf('g', 'h', 'i')
@@ -37,11 +37,22 @@ class BoardTransformerTest {
 
     @Test
     fun fromDBString() {
-        val board: Array<CharArray> = Array(3) { CharArray(3) { '.' } }
+        val board: Array<CharArray> = Array(3) { _ -> CharArray(3) { '.' } }
         board[0] = charArrayOf('a', 'b', 'c')
         board[1] = charArrayOf('d', 'e', 'f')
         board[2] = charArrayOf('g', 'h', 'i')
 
-        then(subject.fromDBString("abcdefghi", 3)).isEqualTo(board)
+        then(subject.fromDBString("abcdefghi", 3, 3)).isEqualTo(board)
+    }
+
+    @Test
+    fun fromDBString_WhenEowsAndColumnsAreDifferent() {
+        val board: Array<CharArray> = Array(4) { _ -> CharArray(3) { '.' } }
+        board[0] = charArrayOf('a', 'b', 'c')
+        board[1] = charArrayOf('d', 'e', 'f')
+        board[2] = charArrayOf('g', 'h', 'i')
+        board[3] = charArrayOf('j', 'k', 'l')
+
+        then(subject.fromDBString("abcdefghijkl", 4, 3)).isEqualTo(board)
     }
 }

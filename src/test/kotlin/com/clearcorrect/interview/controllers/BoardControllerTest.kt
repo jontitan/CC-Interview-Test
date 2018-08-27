@@ -9,6 +9,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
+import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
 class BoardControllerTest {
@@ -25,19 +26,19 @@ class BoardControllerTest {
 
     @Before
     fun setUp() {
-        `when`(mockBoardService.create()).thenReturn(id)
+        `when`(mockBoardService.create(Optional.empty())).thenReturn(id)
         `when`(mockBoardService.fetch(anyLong())).thenReturn(readableBoard)
     }
 
     @Test
     fun createGame_callsBoardService() {
-        subject.createGame()
-        verify(mockBoardService).create()
+        subject.createGame(Optional.empty())
+        verify(mockBoardService).create(Optional.empty())
     }
 
     @Test
     fun createGame_returnsNewBoardId() {
-        then(subject.createGame()).isEqualTo(id)
+        then(subject.createGame(Optional.empty())).isEqualTo(id)
     }
 
     @Test
